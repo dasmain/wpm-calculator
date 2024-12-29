@@ -4,13 +4,14 @@ import { textSamples } from "@/utils/textSamples";
 const WpmComponent = () => {
   const [placeholderText, setPlaceholderText] = useState<string>("");
   const [userInput, setUserInput] = useState<string>("");
-  const [started, setStarted] = useState<Date | null>(null); // type as Date | null
+  const [started, setStarted] = useState<Date | null>(null);
   const [wpm, setWpm] = useState<number>(0);
   const [timeDuration, setTimeDuration] = useState<number>(30);
   const [disabledText, setDisabledText] = useState<boolean>(false);
   const [secondsTimer, setSecondsTimer] = useState<number>(timeDuration);
   const userInputRef = useRef<string>(userInput);
   const [errorCount, setErrorCount] = useState<number>(0);
+  const errorInputRef = useRef<number>(errorCount);
 
   const randomText = () => {
     const index = Math.floor(Math.random() * textSamples.length);
@@ -40,15 +41,15 @@ const WpmComponent = () => {
   }, [started]);
 
   const calculateWPM = () => {
-    if (!started) return; // Check if 'started' is not null before proceeding
+    if (!started) return;
 
-    const elapsedTime = (new Date().getTime() - started.getTime()) / 60000; // Ensure we use .getTime()
-    const wordsTyped = userInputRef.current.length / 5;
+    const elapsedTime = (new Date().getTime() - started.getTime()) / 60000;
+    const wordsTyped = (userInputRef.current.length - errorInputRef.current) / 5;
     const calculatedWpm = Math.floor(wordsTyped / elapsedTime);
     setWpm(calculatedWpm);
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => { // Specify event type
+  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     if (!started) {
       setStarted(new Date());
       setSecondsTimer(timeDuration);
@@ -65,6 +66,7 @@ const WpmComponent = () => {
         errors += 1;
       }
     }
+    errorInputRef.current = errors;
     setErrorCount(errors);
   };
 
