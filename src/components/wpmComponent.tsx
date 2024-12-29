@@ -2,15 +2,15 @@ import React, { useEffect, useRef, useState } from "react";
 import { textSamples } from "@/utils/textSamples";
 
 const WpmComponent = () => {
-  const [placeholderText, setPlaceholderText] = useState("");
-  const [userInput, setUserInput] = useState("");
-  const [started, setStarted] = useState(null);
-  const [wpm, setWpm] = useState(0);
-  const [timeDuration, setTimeDuration] = useState(30);
-  const [disabledText, setDisabledText] = useState(false);
-  const [secondsTimer, setSecondsTimer] = useState(timeDuration);
-  const userInputRef = useRef(userInput);
-  const [errorCount, setErrorCount] = useState(0);
+  const [placeholderText, setPlaceholderText] = useState<string>("");
+  const [userInput, setUserInput] = useState<string>("");
+  const [started, setStarted] = useState<Date | null>(null); // type as Date | null
+  const [wpm, setWpm] = useState<number>(0);
+  const [timeDuration, setTimeDuration] = useState<number>(30);
+  const [disabledText, setDisabledText] = useState<boolean>(false);
+  const [secondsTimer, setSecondsTimer] = useState<number>(timeDuration);
+  const userInputRef = useRef<string>(userInput);
+  const [errorCount, setErrorCount] = useState<number>(0);
 
   const randomText = () => {
     const index = Math.floor(Math.random() * textSamples.length);
@@ -40,13 +40,15 @@ const WpmComponent = () => {
   }, [started]);
 
   const calculateWPM = () => {
-    const elapsedTime = (new Date() - started) / 60000;
+    if (!started) return; // Check if 'started' is not null before proceeding
+
+    const elapsedTime = (new Date().getTime() - started.getTime()) / 60000; // Ensure we use .getTime()
     const wordsTyped = userInputRef.current.length / 5;
     const calculatedWpm = Math.floor(wordsTyped / elapsedTime);
     setWpm(calculatedWpm);
   };
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => { // Specify event type
     if (!started) {
       setStarted(new Date());
       setSecondsTimer(timeDuration);
@@ -99,11 +101,11 @@ const WpmComponent = () => {
           <div
             className="cursor-pointer"
             onClick={() => {
-              setStarted(null),
-                setDisabledText(false),
-                setUserInput(""),
-                randomText(),
-                setSecondsTimer(timeDuration);
+              setStarted(null); // Reset started state to null
+              setDisabledText(false);
+              setUserInput("");
+              randomText();
+              setSecondsTimer(timeDuration);
             }}
           >
             restart/reset
