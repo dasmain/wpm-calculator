@@ -1,9 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
+import { textSamples } from "@/utils/textSamples";
 
 const WpmComponent = () => {
-  const [placeholderText] = useState(
-    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut quis aliquam metus. Praesent id ante vitae diam condimentum feugiat. Mauris gravida, ligula et dignissim laoreet, lectus ligula elementum velit, tristique tincidunt massa neque non libero. Proin ipsum enim, fringilla quis neque vel, accumsan convallis sem. Vestibulum scelerisque vestibulum nulla. Maecenas placerat eleifend tempor. Quisque ornare erat in sollicitudin porta. Sed placerat, sem accumsan iaculis dignissim, risus dolor mollis sapien, eget rutrum odio tellus quis risus. Donec venenatis vestibulum sem at dictum. Quisque fringilla ligula tortor, et ultrices leo mattis at. Donec vel aliquet arcu. Curabitur ut lacinia ligula, at auctor velit. Curabitur interdum risus ac eros blandit, efficitur ullamcorper arcu luctus. Donec molestie maximus diam, at dignissim lacus tincidunt vitae."
-  );
+  const [placeholderText, setPlaceholderText] = useState("");
   const [userInput, setUserInput] = useState("");
   const [started, setStarted] = useState(null);
   const [wpm, setWpm] = useState(0);
@@ -12,6 +11,15 @@ const WpmComponent = () => {
   const [secondsTimer, setSecondsTimer] = useState(timeDuration);
   const userInputRef = useRef(userInput);
   const [errorCount, setErrorCount] = useState(0);
+
+  const randomText = () => {
+    const index = Math.floor(Math.random() * textSamples.length);
+    setPlaceholderText(textSamples[index]);
+  };
+
+  useEffect(() => {
+    randomText();
+  }, []);
 
   useEffect(() => {
     if (!started) return;
@@ -44,11 +52,11 @@ const WpmComponent = () => {
       setSecondsTimer(timeDuration);
       setDisabledText(false);
     }
-  
+
     const input = e.target.value;
     setUserInput(input);
     userInputRef.current = input;
-  
+
     let errors = 0;
     for (let i = 0; i < input.length; i++) {
       if (input[i] !== placeholderText[i]) {
@@ -57,7 +65,6 @@ const WpmComponent = () => {
     }
     setErrorCount(errors);
   };
-  
 
   const renderHighlightedText = () => {
     return placeholderText.split("").map((char, index) => {
@@ -95,13 +102,16 @@ const WpmComponent = () => {
               setStarted(null),
                 setDisabledText(false),
                 setUserInput(""),
+                randomText(),
                 setSecondsTimer(timeDuration);
             }}
           >
             restart/reset
           </div>
           {disabledText && <h1 className="text-2xl">WPM: {wpm}</h1>}
-          {disabledText && <div className="text-red-500">Errors: {errorCount}</div>}
+          {disabledText && (
+            <div className="text-red-500">Errors: {errorCount}</div>
+          )}
           <span
             onClick={() => {
               setTimeDuration(15);
@@ -138,7 +148,7 @@ const WpmComponent = () => {
         </div>
         <div>By Diyan {"<"}3</div>
       </div>
-      <div className="w-[80%] h-96 p-4 text-2xl relative">
+      <div className="w-[80%] h-96 p-4 text-xl relative">
         <div
           className="absolute inset-0 pointer-events-none text-justify leading-relaxed"
           style={{ whiteSpace: "pre-wrap" }}
